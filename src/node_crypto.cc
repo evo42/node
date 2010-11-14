@@ -24,7 +24,7 @@ static Persistent<String> syscall_symbol;
 static Persistent<String> subject_symbol;
 static Persistent<String> subjectaltname_symbol;
 static Persistent<String> modulus_symbol;
-static Persistent<String> exponent_symbol
+static Persistent<String> exponent_symbol;
 static Persistent<String> issuer_symbol;
 static Persistent<String> valid_from_symbol;
 static Persistent<String> valid_to_symbol;
