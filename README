@@ -1,24 +1,14 @@
-Evented I/O for V8 javascript.
-
-To build:
-
-  ./configure
-  make 
-  make install
-
-To run the tests:
-  
-  make test
-
-To build the documentation:
-
-  make doc
+WebID Protocol & client side certificate friendly version!
  
-To read the documentation:
+Identical to node.js in every way, but has a modified crypto.cc which exposes more properties for client side certificates
 
-  man doc/node.1
+modifies getPeerCertificate() to also return:
 
-See http://nodejs.org/ for more information. For help and discussion
-subscribe to the mailing list by visiting
-http://groups.google.com/group/nodejs or by sending an email to
-nodejs+subscribe@googlegroups.com.
+ {
+   ...
+   subjectaltname:
+   exponent:
+   modulus:
+ }
+ 
+ !
