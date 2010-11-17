@@ -21,7 +21,7 @@ if os.environ.has_key('JOBS'):
 
 
 def canonical_cpu_type(arch):
-  m = {'i386':'ia32', 'x86_64':'x64', 'amd64':'x64'}
+  m = {'x86': 'ia32', 'i386':'ia32', 'x86_64':'x64', 'amd64':'x64'}
   if arch in m: arch = m[arch]
   if not arch in supported_archs:
     raise Exception("supported architectures are "+', '.join(supported_archs)+\
@@ -353,6 +353,14 @@ def configure(conf):
   # platform
   conf.env.append_value('CPPFLAGS', '-DPLATFORM="' + conf.env['DEST_OS'] + '"')
 
+  platform_file = "src/platform_%s.cc" % conf.env['DEST_OS']
+  if os.path.exists(join(cwd, platform_file)):
+    Options.options.platform_file = True
+    conf.env["PLATFORM_FILE"] = platform_file
+  else:
+    Options.options.platform_file = False
+    conf.env["PLATFORM_FILE"] = "src/platform_none.cc"
+
   if conf.env['USE_PROFILING'] == True:
     conf.env.append_value('CPPFLAGS', '-pg')
     conf.env.append_value('LINKFLAGS', '-pg')
@@ -563,15 +571,9 @@ def build(bld):
     src/node_timer.cc
     src/node_script.cc
   """
+  node.source += bld.env["PLATFORM_FILE"]
   if not product_type_is_lib:
     node.source = 'src/node_main.cc '+node.source
-
-  platform_file = "src/platform_%s.cc" % bld.env['DEST_OS']
-  if os.path.exists(join(cwd, platform_file)):
-    node.source += platform_file
-  else:
-    node.source += "src/platform_none.cc "
-
 
   if bld.env["USE_OPENSSL"]: node.source += " src/node_crypto.cc "
 
@@ -660,6 +662,10 @@ def shutdown():
     if not Options.options.use_openssl:
       print "WARNING WARNING WARNING"
       print "OpenSSL not found. Will compile Node without crypto support!"
+
+    if not Options.options.platform_file:
+      print "WARNING: Platform not fully supported. Using src/platform_none.cc"
+
   elif not Options.commands['clean']:
     if os.path.exists('build/default/node') and not os.path.exists('node'):
       os.symlink('build/default/node', 'node')
